@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Query Rule Spreadsheet Upload</title>
+
+    <link rel="stylesheet" type="text/css" href="./style.css"/>
+</head>
+<body>
+<main class="search-container">
+    <div class="main-panel">
+        <h1>Query Rule CSV Upload Form</h1>
+        <form id="csv-upload-form">
+            <div id="errors" class="error"></div>
+            <div class="form-field-wrapper">
+                <label for="file-input">File:</label>
+                <div class="ais-search-box">
+                    <input type="file" name="file" id="file-input" accept=".csv" placeholder="Upload a CSV file here">
+                </div>
+            </div>
+            <div class="form-field-wrapper">
+                <label for="app-id-input">App ID:</label>
+                <div class="ais-search-box">
+                    <input type="text" class="ais-search-box--input" name="appId" id="app-id-input"
+                           placeholder="Enter your Algolia App ID here">
+                </div>
+            </div>
+            <div class="form-field-wrapper">
+                <label for="api-key-input">API Key:</label>
+                <div class="ais-search-box">
+                    <input type="text" class="ais-search-box--input" name="apiKey" id="api-key-input"
+                           placeholder="Enter your API Key here">
+                </div>
+            </div>
+            <div class="form-field-wrapper">
+                <label for="index-name-input">Index Name:</label>
+                <div class="ais-search-box">
+                    <input type="text" class="ais-search-box--input" name="indexName" id="index-name-input"
+                           placeholder="Enter the index name here">
+                </div>
+            </div>
+            <div class="form-field-wrapper">
+                <button class="Button Button-primary" type="submit">Submit</button>
+            </div>
+        </form>
+    </div>
+</main>
+<!-- You can also require other files to run in this process -->
+<script src="./renderer.js"></script>
+<script src="./query_rules_script.js"></script>
+</body>
+</html>

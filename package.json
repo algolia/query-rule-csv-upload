@@ -1,0 +1,23 @@
+{
+  "name": "query-rule-upload",
+  "version": "1.0",
+  "description": "A tool to upload query rules from CSV",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "dependencies": {
+    "algoliasearch": "^3.33.0",
+    "csv-parser": "^2.3.0"
+  },
+  "devDependencies": {
+    "electron": "^5.0.5",
+    "electron-builder": "^20.44.4"
+  },
+  "build": {
+    "appId": "com.algolia.queryruleupload",
+    "productName": "Query Rule Upload"
+  }
+}
