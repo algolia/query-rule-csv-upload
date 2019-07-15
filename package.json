@@ -1,6 +1,6 @@
 {
   "name": "query-rule-upload",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "A tool to upload query rules from CSV",
   "main": "main.js",
   "scripts": {
