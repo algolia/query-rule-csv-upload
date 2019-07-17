@@ -42,4 +42,10 @@ The spreadsheet contains the following columns:
         "CustomDataField1": "this is the data",
         "CustomDataField2": "this is the data again"
     }
-    ```          
+    ```
+    
+## Contribute
+To contribute to the project:
+1. Clone this repository
+2. Commit your changes - make sure your local repo is up to date
+3. Send a pull request to the `develop` branch             
