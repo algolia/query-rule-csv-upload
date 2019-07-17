@@ -1,5 +1,5 @@
 # Query Rule CSV Upload
-A tool that enables users to manage their query rules via a spreadsheet 
+Manage your Algolia query rules with a CSV file 
 
 ## Requirements
 * [Node.js](https://nodejs.org/)
