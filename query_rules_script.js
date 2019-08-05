@@ -97,6 +97,18 @@ const csv = require('csv-parser');
                             userData[key] = row[key].trim();
                         }
                     }
+
+                    let formattedUserData = {};
+                    for(let key in userData){
+                        if(userData.hasOwnProperty(key)){
+                            formattedUserData[key.toLowerCase()] = userData[key];
+                        }
+                    }
+                    userData = {};
+                    userData[queryContext || 'Context'] = {
+                        'banner-1': formattedUserData
+                    };
+
                     consequence.userData = userData;
 
                     rule.consequence = consequence;
