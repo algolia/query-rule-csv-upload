@@ -56,7 +56,6 @@ const csv = require('csv-parser');
             .on('data', (row) => {
                 try {
                     let rule = {};
-
                     const queryUpdated = row['Date Updated'].trim();
                     const queryUpdatedBy = row['Updated By'].trim();
                     const queryPatternID = row['Query Rule ID'].trim();
@@ -65,6 +64,7 @@ const csv = require('csv-parser');
                     const queryPattern = row['Search Term'].trim();
                     const queryReplacement = row['Replace Query'].trim();
                     const queryEnabled = row['Enabled'].trim();
+                    const queryAlternatives = row['Alternatives'] && row['Alternatives'].trim().toLowerCase();
 
 
                     const formattedQueryPattern = queryPatternID.replace(/\s+/g, '-');
@@ -73,10 +73,11 @@ const csv = require('csv-parser');
 
                     rule.objectID = objectID;
                     rule.description = objectDescription;
-                    rule.enabled = queryEnabled.toLowerCase() !== 'false';
+                    rule.enabled = typeof queryEnabled !== 'string' || queryEnabled.toLowerCase() !== 'false';
                     rule.condition = {
                         pattern: queryPattern,
-                        anchoring: queryAnchoring
+                        anchoring: queryAnchoring,
+                        alternatives: queryAlternatives === 'true'
                     };
                     if(queryContext){
                         rule.condition.context = queryContext;
@@ -90,12 +91,24 @@ const csv = require('csv-parser');
                     }
                     let userData = {};
                     //TODO figure out how to make use this list above
-                    const keyExclusions = ['Date Updated', 'Updated By', 'Query Rule ID', 'Context', 'Anchoring', 'Search Term', 'Replace Query', 'Enabled'];
+                    const keyExclusions = ['Date Updated', 'Updated By', 'Query Rule ID', 'Context', 'Anchoring', 'Search Term', 'Replace Query', 'Enabled', 'Alternatives'];
                     for(let key in row){
                         if(row.hasOwnProperty(key) && keyExclusions.indexOf(key) === -1 && typeof row[key] === 'string'){
                             userData[key] = row[key].trim();
                         }
                     }
+
+                    let formattedUserData = {};
+                    for(let key in userData){
+                        if(userData.hasOwnProperty(key)){
+                            formattedUserData[key.toLowerCase()] = userData[key];
+                        }
+                    }
+                    userData = {};
+                    userData[queryContext || 'Context'] = {
+                        'banner-1': formattedUserData
+                    };
+
                     consequence.userData = userData;
 
                     rule.consequence = consequence;
@@ -110,8 +123,7 @@ const csv = require('csv-parser');
                 if(rules.length > 0){
                     index.batchRules(rules, (err) => {
                         if(err){
-debugger;
-                            setError(errorContainer, 'Please enter a valid application ID and API key.');
+                            setError(errorContainer, 'An error occurred. Message:' + err.message);
                         }
                         else {
                             let successMessage = document.createElement('span');
