@@ -73,7 +73,7 @@ const csv = require('csv-parser');
 
                     rule.objectID = objectID;
                     rule.description = objectDescription;
-                    rule.enabled = queryEnabled && queryEnabled.toLowerCase() !== 'false';
+                    rule.enabled = typeof queryEnabled !== 'string' || queryEnabled.toLowerCase() !== 'false';
                     rule.condition = {
                         pattern: queryPattern,
                         anchoring: queryAnchoring,
