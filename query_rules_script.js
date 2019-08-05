@@ -56,16 +56,54 @@ const csv = require('csv-parser');
             .on('data', (row) => {
                 try {
                     let rule = {};
-                    const queryUpdated = row['Date Updated'].trim();
-                    const queryUpdatedBy = row['Updated By'].trim();
-                    const queryPatternID = row['Query Rule ID'].trim();
-                    const queryContext = row['Context'] && row['Context'].trim();
-                    const queryAnchoring = (row['Anchoring'] && row['Anchoring'].trim()) || 'contains';
-                    const queryPattern = row['Search Term'].trim();
-                    const queryReplacement = row['Replace Query'].trim();
-                    const queryEnabled = row['Enabled'].trim();
-                    const queryAlternatives = row['Alternatives'] && row['Alternatives'].trim().toLowerCase();
 
+                    const defaultExtractor = (row, key) => row[key] && row[key].trim();
+                    let reservedTermDefinitions = {
+                        'Date Updated': {
+                            name: 'queryUpdated',
+                            extractor: defaultExtractor
+                        },
+                        'Updated By': {
+                            name: 'queryUpdatedBy',
+                            extractor: defaultExtractor
+                        },
+                        'Query Rule ID': {
+                            name: 'queryPatternID',
+                            extractor: defaultExtractor
+                        },
+                        'Context': {
+                            name: 'queryContext',
+                            extractor: defaultExtractor
+                        },
+                        'Anchoring': {
+                            name: 'queryAnchoring',
+                            extractor: (row, key) => (row[key] && row[key].trim()) || 'contains'
+                        },
+                        'Search Term': {
+                            name: 'queryPattern',
+                            extractor: defaultExtractor
+                        },
+                        'Replace Query': {
+                            name: 'queryReplacement',
+                            extractor: defaultExtractor
+                        },
+                        'Enabled': {
+                            name: 'queryEnabled',
+                            extractor: defaultExtractor
+                        },
+                        'Alternatives': {
+                            name: 'queryAlternatives',
+                            extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
+                        }
+                    };
+
+                    let reservedTerms = {};
+                    for(let key in reservedTermDefinitions){
+                        let definition = reservedTermDefinitions[key];
+                        reservedTerms[definition.name] = definition.extractor(row, key);
+                    }
+
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/\s+/g, '-');
                     const objectID = queryContext + "--" + formattedQueryPattern;
@@ -90,8 +128,7 @@ const csv = require('csv-parser');
                         };
                     }
                     let userData = {};
-                    //TODO figure out how to make use this list above
-                    const keyExclusions = ['Date Updated', 'Updated By', 'Query Rule ID', 'Context', 'Anchoring', 'Search Term', 'Replace Query', 'Enabled', 'Alternatives'];
+                    const keyExclusions = Object.keys(reservedTermDefinitions);
                     for(let key in row){
                         if(row.hasOwnProperty(key) && keyExclusions.indexOf(key) === -1 && typeof row[key] === 'string'){
                             userData[key] = row[key].trim();
@@ -104,14 +141,21 @@ const csv = require('csv-parser');
                     rules.push(rule);
                 }
                 catch(e){
-                    setError(e.message);
+                    let errorMessage;
+                    if(typeof e === 'string'){
+                        errorMessage = e;
+                    }
+                    else if(typeof e.message === 'string'){
+                        errorMessage = e.message;
+                    }
+                    setError(errorContainer, errorMessage);
                 }
             })
             .on('end', () => {
                 if(rules.length > 0){
                     index.batchRules(rules, (err) => {
                         if(err){
-                            setError(errorContainer, 'An error occurred. Message:' + err.message);
+                            setError(errorContainer, 'An error occurred. Message: ' + err.message);
                         }
                         else {
                             let successMessage = document.createElement('span');
