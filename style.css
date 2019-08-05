@@ -2,7 +2,7 @@
 
 .error {
     color: red;
-    height: 1em;
+    min-height: 1em;
     margin-bottom: 1em;
 }
 .success {
@@ -97,7 +97,6 @@ em {
 
 .main-panel {
     flex: 1;
-    max-width: 450px;
 }
 
 #searchbox,
