@@ -42,7 +42,7 @@ const csv = require('csv-parser');
     };
 
     const processForm = (form, errorContainer) => {
-        const {fileInput, appIdInput, apiKeyInput, indexNameInput} = getFields(form);
+        const {fileInput, appIdInput, apiKeyInput, indexNameInput, forwardToReplicasInput} = getFields(form);
         const client = algoliasearch(appIdInput.value, apiKeyInput.value);
         const index = client.initIndex(indexNameInput.value);
         let rules = [];
@@ -153,7 +153,8 @@ const csv = require('csv-parser');
             })
             .on('end', () => {
                 if(rules.length > 0){
-                    index.batchRules(rules, (err) => {
+                    const forwardToReplicas = forwardToReplicasInput.checked;
+                    index.batchRules(rules, {forwardToReplicas: forwardToReplicas}, (err) => {
                         if(err){
                             setError(errorContainer, 'An error occurred. Message: ' + err.message);
                         }
