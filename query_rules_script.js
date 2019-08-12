@@ -105,7 +105,7 @@ const csv = require('csv-parser');
 
                     const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryAlternatives} = reservedTerms;
 
-                    const formattedQueryPattern = queryPatternID.replace(/\s+/g, '-');
+                    const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = queryContext + "--" + formattedQueryPattern;
                     const objectDescription = `${queryPatternID} - ${queryContext} - updated ${queryUpdated} by ${queryUpdatedBy}`;
 
