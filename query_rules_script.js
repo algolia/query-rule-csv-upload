@@ -91,6 +91,10 @@ const csv = require('csv-parser');
                             name: 'queryEnabled',
                             extractor: defaultExtractor
                         },
+                        'Filters': {
+                            name: 'queryFilters',
+                            extractor: defaultExtractor
+                        },
                         'Alternatives': {
                             name: 'queryAlternatives',
                             extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
@@ -103,7 +107,7 @@ const csv = require('csv-parser');
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryAlternatives, queryFilters} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = queryContext + "--" + formattedQueryPattern;
@@ -121,11 +125,14 @@ const csv = require('csv-parser');
                         rule.condition.context = queryContext;
                     }
 
-                    let consequence = {};
+                    let consequence = {
+                        params: {}
+                    };
                     if(queryReplacement){
-                        consequence.params = {
-                            query: queryReplacement
-                        };
+                        consequence.params.query = queryReplacement;
+                    }
+                    if(queryFilters){
+                        consequence.params.filters = queryFilters;
                     }
                     let userData = {};
                     const keyExclusions = Object.keys(reservedTermDefinitions);
