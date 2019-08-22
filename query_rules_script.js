@@ -72,6 +72,10 @@ const csvstring = require('csv-string');
                             name: 'queryPatternID',
                             extractor: defaultExtractor
                         },
+                        'Enabled': {
+                            name: 'queryEnabled',
+                            extractor: defaultExtractor
+                        },
                         'Context': {
                             name: 'queryContext',
                             extractor: defaultExtractor
@@ -88,8 +92,8 @@ const csvstring = require('csv-string');
                             name: 'queryReplacement',
                             extractor: defaultExtractor
                         },
-                        'Enabled': {
-                            name: 'queryEnabled',
+                        'Remove Words': {
+                            name: 'queryRemoveWords',
                             extractor: defaultExtractor
                         },
                         'Filters': {
@@ -112,7 +116,7 @@ const csvstring = require('csv-string');
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryFilters, queryOptionalFilters, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
@@ -136,6 +140,18 @@ const csvstring = require('csv-string');
                     if(queryReplacement){
                         consequence.params.query = queryReplacement;
                     }
+                    else {
+                        consequence.params.query = {
+                            edits: []
+                        };
+                        if(queryRemoveWords){
+                            consequence.params.query.edits.push({
+                                type: 'remove',
+                                delete: queryRemoveWords
+                            });
+                        }
+                    }
+
                     if(queryFilters){
                         consequence.params.filters = queryFilters;
                     }
