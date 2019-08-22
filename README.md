@@ -37,6 +37,7 @@ The spreadsheet contains the following columns:
 * Search Term - the term being matched
 * [Replace Query](https://www.algolia.com/doc/api-reference/api-methods/save-rule/#method-param-query) - if you want to add a consequence that replaces the query, you can set the replacement query here
 * [Filters](https://www.algolia.com/doc/api-reference/api-parameters/filters/) - if you want to add filters as a query parameter, you can do so here
+* [Optional Filters](https://www.algolia.com/doc/api-reference/api-parameters/optionalFilters/) - if you want to add optional filters as a query parameter, you can do so here
 * Alternatives - this can be set to `true` to enable alternatives to be considered for this rule. **Note: this feature is in beta and only available for certain Enterprise customers.**  
 * All other fields will be added as custom data. For example, the template has columns named `CustomDataField1` and `CustomDataField2`, which will add custom data in the following format: 
     ```  

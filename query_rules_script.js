@@ -7,6 +7,7 @@
 const algoliasearch = require('algoliasearch');
 const fs = require('fs');
 const csv = require('csv-parser');
+const CSVString = require('csv-string');
 
 
 (function(){
@@ -95,6 +96,10 @@ const csv = require('csv-parser');
                             name: 'queryFilters',
                             extractor: defaultExtractor
                         },
+                        'Optional Filters': {
+                            name: 'queryOptionalFilters',
+                            extractor: (row, key) => row[key] && CSVString.parse(row[key])
+                        },
                         'Alternatives': {
                             name: 'queryAlternatives',
                             extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
@@ -107,7 +112,7 @@ const csv = require('csv-parser');
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryAlternatives, queryFilters} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryFilters, queryOptionalFilters, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = queryContext + "--" + formattedQueryPattern;
@@ -133,6 +138,9 @@ const csv = require('csv-parser');
                     }
                     if(queryFilters){
                         consequence.params.filters = queryFilters;
+                    }
+                    if(queryOptionalFilters){
+                        consequence.params.optionalFilters = queryOptionalFilters;
                     }
                     let userData = {};
                     const keyExclusions = Object.keys(reservedTermDefinitions);
