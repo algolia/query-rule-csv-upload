@@ -7,7 +7,7 @@
 const algoliasearch = require('algoliasearch');
 const fs = require('fs');
 const csv = require('csv-parser');
-const CSVString = require('csv-string');
+const csvstring = require('csv-string');
 
 
 (function(){
@@ -98,7 +98,7 @@ const CSVString = require('csv-string');
                         },
                         'Optional Filters': {
                             name: 'queryOptionalFilters',
-                            extractor: (row, key) => row[key] && CSVString.parse(row[key])
+                            extractor: (row, key) => row[key] && csvstring.parse(row[key])
                         },
                         'Alternatives': {
                             name: 'queryAlternatives',
@@ -115,7 +115,7 @@ const CSVString = require('csv-string');
                     const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryFilters, queryOptionalFilters, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
-                    const objectID = queryContext + "--" + formattedQueryPattern;
+                    const objectID = `${queryContext}--${formattedQueryPattern}`;
                     const objectDescription = `${queryPatternID} - ${queryContext} - updated ${queryUpdated} by ${queryUpdatedBy}`;
 
                     rule.objectID = objectID;
@@ -171,12 +171,12 @@ const CSVString = require('csv-string');
                     const forwardToReplicas = forwardToReplicasInput.checked;
                     index.batchRules(rules, {forwardToReplicas: forwardToReplicas}, (err) => {
                         if(err){
-                            setError(errorContainer, 'An error occurred. Message: ' + err.message);
+                            setError(errorContainer, `An error occurred. Message: ${err.message}`);
                         }
                         else {
                             let successMessage = document.createElement('span');
                             successMessage.className = 'success';
-                            successMessage.innerText = 'Successfully updated ' + rules.length + ' query rules.';
+                            successMessage.innerText = `Successfully updated ${rules.length} query ${rules.length === 1? 'rule': 'rules'}.`;
                             errorContainer.innerHTML = successMessage.outerHTML;
                         }
                     });
