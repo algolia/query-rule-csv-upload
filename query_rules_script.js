@@ -7,6 +7,7 @@
 const algoliasearch = require('algoliasearch');
 const fs = require('fs');
 const csv = require('csv-parser');
+const csvstring = require('csv-string');
 
 
 (function(){
@@ -91,6 +92,14 @@ const csv = require('csv-parser');
                             name: 'queryEnabled',
                             extractor: defaultExtractor
                         },
+                        'Filters': {
+                            name: 'queryFilters',
+                            extractor: defaultExtractor
+                        },
+                        'Optional Filters': {
+                            name: 'queryOptionalFilters',
+                            extractor: (row, key) => row[key] && csvstring.parse(row[key])
+                        },
                         'Alternatives': {
                             name: 'queryAlternatives',
                             extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
@@ -103,10 +112,10 @@ const csv = require('csv-parser');
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryContext, queryAnchoring, queryPattern, queryReplacement, queryEnabled, queryFilters, queryOptionalFilters, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
-                    const objectID = queryContext + "--" + formattedQueryPattern;
+                    const objectID = `${queryContext}--${formattedQueryPattern}`;
                     const objectDescription = `${queryPatternID} - ${queryContext} - updated ${queryUpdated} by ${queryUpdatedBy}`;
 
                     rule.objectID = objectID;
@@ -121,11 +130,17 @@ const csv = require('csv-parser');
                         rule.condition.context = queryContext;
                     }
 
-                    let consequence = {};
+                    let consequence = {
+                        params: {}
+                    };
                     if(queryReplacement){
-                        consequence.params = {
-                            query: queryReplacement
-                        };
+                        consequence.params.query = queryReplacement;
+                    }
+                    if(queryFilters){
+                        consequence.params.filters = queryFilters;
+                    }
+                    if(queryOptionalFilters){
+                        consequence.params.optionalFilters = queryOptionalFilters;
                     }
                     let userData = {};
                     const keyExclusions = Object.keys(reservedTermDefinitions);
@@ -156,12 +171,12 @@ const csv = require('csv-parser');
                     const forwardToReplicas = forwardToReplicasInput.checked;
                     index.batchRules(rules, {forwardToReplicas: forwardToReplicas}, (err) => {
                         if(err){
-                            setError(errorContainer, 'An error occurred. Message: ' + err.message);
+                            setError(errorContainer, `An error occurred. Message: ${err.message}`);
                         }
                         else {
                             let successMessage = document.createElement('span');
                             successMessage.className = 'success';
-                            successMessage.innerText = 'Successfully updated ' + rules.length + ' query rules.';
+                            successMessage.innerText = `Successfully updated ${rules.length} query ${rules.length === 1? 'rule': 'rules'}.`;
                             errorContainer.innerHTML = successMessage.outerHTML;
                         }
                     });
