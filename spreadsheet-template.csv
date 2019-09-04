@@ -1,2 +1,2 @@
-Date Updated,Updated By,Query Rule ID,Enabled,Context,Anchoring,Search Term,Replace Query,Filters,Optional Filters,Remove Words,Alternatives,CustomDataField1,CustomDataField2
-8/22,Chris,example-disabled,FALSE,,is,example,,,,,,this is the data,this is the data again
+Date Updated,Updated By,Query Rule ID,Enabled,Context,Anchoring,Search Term,Replace Query,Remove Words,Filters,Optional Filters,Promoted Item 1,Promoted Item 10,Alternatives,CustomDataField1,CustomDataField2
+9/4,Chris,example-disabled,FALSE,example-context,is,example,,,,,objectId1,objectId10,,this is the data,this is the data again

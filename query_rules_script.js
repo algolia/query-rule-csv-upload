@@ -8,6 +8,7 @@ const algoliasearch = require('algoliasearch');
 const fs = require('fs');
 const csv = require('csv-parser');
 const csvstring = require('csv-string');
+const maxPromotions = 300;
 
 
 (function(){
@@ -104,6 +105,23 @@ const csvstring = require('csv-string');
                             name: 'queryOptionalFilters',
                             extractor: (row, key) => row[key] && csvstring.parse(row[key])
                         },
+                        "Promoted Item": {
+                            name: 'queryPromotions',
+                            extractor: (row, key) => {
+                                let promotedItems = [];
+                                for(let i = 1; i <= maxPromotions; i++){
+                                    const generatedKey = key + ' ' + i;
+                                    let value = defaultExtractor(row, generatedKey);
+                                    if(value){
+                                        promotedItems.push({
+                                            "objectID": value,
+                                            "position": i - 1
+                                        });
+                                    }
+                                }
+                                return promotedItems;
+                            }
+                        },
                         'Alternatives': {
                             name: 'queryAlternatives',
                             extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
@@ -116,7 +134,7 @@ const csvstring = require('csv-string');
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotions, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
@@ -160,12 +178,19 @@ const csvstring = require('csv-string');
                     }
                     let userData = {};
                     const keyExclusions = Object.keys(reservedTermDefinitions);
+                    const arrayContains = (array, value) => {
+                        return array.some((element) => value.startsWith(element));
+                    };
                     for(let key in row){
-                        if(row.hasOwnProperty(key) && keyExclusions.indexOf(key) === -1 && typeof row[key] === 'string'){
+                        if(row.hasOwnProperty(key) && !arrayContains(keyExclusions, key) && typeof row[key] === 'string'){
                             userData[key] = row[key].trim();
                         }
                     }
                     consequence.userData = userData;
+                    
+                    if(Array.isArray(queryPromotions) && queryPromotions.length > 0){
+                        consequence.promote = queryPromotions;
+                    }
 
                     rule.consequence = consequence;
 
