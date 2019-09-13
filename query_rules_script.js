@@ -194,11 +194,13 @@ const maxPromotions = 300;
                         return array.some((element) => value.startsWith(element));
                     };
                     for(let key in row){
-                        if(row.hasOwnProperty(key) && !arrayContains(keyExclusions, key) && typeof row[key] === 'string'){
+                        if(row.hasOwnProperty(key) && !arrayContains(keyExclusions, key) && typeof row[key] === 'string' && row[key]){
                             userData[key] = row[key].trim();
                         }
                     }
-                    consequence.userData = userData;
+                    if(Object.keys(userData).length > 0){
+                        consequence.userData = userData;
+                    }
                     
                     if(Array.isArray(queryPromotions) && queryPromotions.length > 0){
                         consequence.promote = queryPromotions;
