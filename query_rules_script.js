@@ -105,6 +105,22 @@ const maxPromotions = 300;
                             name: 'queryOptionalFilters',
                             extractor: (row, key) => row[key] && csvstring.parse(row[key])
                         },
+                        "Promoted Items": {
+                            name: 'queryPromotionsList',
+                            extractor: (row, key) => {
+                                if(row[key]){
+                                    const objectIds = csvstring.parse(row[key]);
+                                    if(Array.isArray(objectIds) && Array.isArray(objectIds[0])){
+                                        return objectIds[0].map((value, index) => {
+                                            return {
+                                                "objectID": value,
+                                                "position": index
+                                            };
+                                        });
+                                    }
+                                }
+                            }
+                        },
                         "Promoted Item": {
                             name: 'queryPromotions',
                             extractor: (row, key) => {
@@ -134,7 +150,7 @@ const maxPromotions = 300;
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotions, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
@@ -201,9 +217,12 @@ const maxPromotions = 300;
                     if(Object.keys(userData).length > 0){
                         consequence.userData = userData;
                     }
-                    
+
                     if(Array.isArray(queryPromotions) && queryPromotions.length > 0){
                         consequence.promote = queryPromotions;
+                    }
+                    else if(Array.isArray(queryPromotionsList) && queryPromotionsList.length > 0){
+                        consequence.promote = queryPromotionsList;
                     }
 
                     rule.consequence = consequence;
@@ -231,7 +250,7 @@ const maxPromotions = 300;
                         else {
                             let successMessage = document.createElement('span');
                             successMessage.className = 'success';
-                            successMessage.innerText = `Successfully updated ${rules.length} query ${rules.length === 1? 'rule': 'rules'}.`;
+                            successMessage.innerText = `Successfully updated ${rules.length} query ${rules.length === 1 ? 'rule' : 'rules'}.`;
                             errorContainer.innerHTML = successMessage.outerHTML;
                         }
                     });
