@@ -138,7 +138,19 @@ const maxPromotions = 300;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
-                    const objectDescription = `${queryPatternID} - ${queryContext} - updated ${queryUpdated} by ${queryUpdatedBy}`;
+                    let objectDescription = `${queryPatternID}`;
+                    if(queryContext){
+                        objectDescription += ` - ${queryContext}`;
+                    }
+                    if(queryUpdated || queryUpdatedBy){
+                        objectDescription += " - updated";
+                        if(queryUpdated){
+                            objectDescription += ` ${queryUpdated}`;
+                        }
+                        if(queryUpdatedBy){
+                            objectDescription += ` by ${queryUpdatedBy}`;
+                        }
+                    }
 
                     rule.objectID = objectID;
                     rule.description = objectDescription;
