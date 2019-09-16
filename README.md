@@ -19,6 +19,8 @@ To build:
   * For example, to build for Mac, you would run `electron-builder -m`
   * Multiple environments can be built in parallel
   
+A copy of the application built for [Mac](dist/Query%20Rule%20Upload-mac.dmg) is located in the [dist](dist) folder. 
+  
 ## Usage
 To use the tool, 4 pieces of information are required:
 1. A CSV file describing the query rules - a [template](spreadsheet-template.csv) is included in this repository

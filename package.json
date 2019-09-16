@@ -20,6 +20,7 @@
   },
   "build": {
     "appId": "com.algolia.queryruleupload",
-    "productName": "Query Rule Upload"
+    "productName": "Query Rule Upload",
+    "artifactName": "${productName}-${os}.${ext}"
   }
 }
