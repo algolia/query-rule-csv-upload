@@ -11,7 +11,8 @@
   "dependencies": {
     "algoliasearch": "^3.33.0",
     "csv-parser": "^2.3.0",
-    "csv-string": "^3.1.6"
+    "csv-string": "^3.1.6",
+    "moment": "^2.24.0"
   },
   "devDependencies": {
     "electron": "^5.0.5",

@@ -8,6 +8,7 @@ const algoliasearch = require('algoliasearch');
 const fs = require('fs');
 const csv = require('csv-parser');
 const csvstring = require('csv-string');
+const moment = require('moment');
 const maxPromotions = 300;
 
 
@@ -60,6 +61,14 @@ const maxPromotions = 300;
                     let rule = {};
 
                     const defaultExtractor = (row, key) => row[key] && row[key].trim();
+                    const dateExtractor = (row, key) => {
+                        if(row[key]){
+                            const m = moment(row[key], 'MM/DD/YYYY');
+                            if(m.isValid()){
+                                return m.unix();
+                            }
+                        }
+                    };
                     let reservedTermDefinitions = {
                         'Date Updated': {
                             name: 'queryUpdated',
@@ -138,6 +147,14 @@ const maxPromotions = 300;
                                 return promotedItems;
                             }
                         },
+                        "Start Date": {
+                            name: 'queryStartDate',
+                            extractor: dateExtractor
+                        },
+                        "End Date": {
+                            name: 'queryEndDate',
+                            extractor: dateExtractor
+                        },
                         'Alternatives': {
                             name: 'queryAlternatives',
                             extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
@@ -150,7 +167,7 @@ const maxPromotions = 300;
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryStartDate, queryEndDate, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
@@ -178,6 +195,13 @@ const maxPromotions = 300;
                     };
                     if(queryContext){
                         rule.condition.context = queryContext;
+                    }
+
+                    if(queryStartDate && queryEndDate && queryStartDate < queryEndDate){
+                        rule.validity = [{
+                            from: queryStartDate,
+                            until: queryEndDate
+                        }];
                     }
 
                     let consequence = {
