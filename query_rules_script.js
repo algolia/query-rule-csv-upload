@@ -8,6 +8,7 @@ const algoliasearch = require('algoliasearch');
 const fs = require('fs');
 const csv = require('csv-parser');
 const csvstring = require('csv-string');
+const moment = require('moment');
 const maxPromotions = 300;
 
 
@@ -60,6 +61,14 @@ const maxPromotions = 300;
                     let rule = {};
 
                     const defaultExtractor = (row, key) => row[key] && row[key].trim();
+                    const dateExtractor = (row, key) => {
+                        if(row[key]){
+                            const m = moment(row[key], 'MM/DD/YYYY');
+                            if(m.isValid()){
+                                return m.unix();
+                            }
+                        }
+                    };
                     let reservedTermDefinitions = {
                         'Date Updated': {
                             name: 'queryUpdated',
@@ -105,6 +114,22 @@ const maxPromotions = 300;
                             name: 'queryOptionalFilters',
                             extractor: (row, key) => row[key] && csvstring.parse(row[key])
                         },
+                        "Promoted Items": {
+                            name: 'queryPromotionsList',
+                            extractor: (row, key) => {
+                                if(row[key]){
+                                    const objectIds = csvstring.parse(row[key]);
+                                    if(Array.isArray(objectIds) && Array.isArray(objectIds[0])){
+                                        return objectIds[0].map((value, index) => {
+                                            return {
+                                                "objectID": value,
+                                                "position": index
+                                            };
+                                        });
+                                    }
+                                }
+                            }
+                        },
                         "Promoted Item": {
                             name: 'queryPromotions',
                             extractor: (row, key) => {
@@ -122,6 +147,14 @@ const maxPromotions = 300;
                                 return promotedItems;
                             }
                         },
+                        "Start Date": {
+                            name: 'queryStartDate',
+                            extractor: dateExtractor
+                        },
+                        "End Date": {
+                            name: 'queryEndDate',
+                            extractor: dateExtractor
+                        },
                         'Alternatives': {
                             name: 'queryAlternatives',
                             extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
@@ -134,11 +167,23 @@ const maxPromotions = 300;
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotions, queryAlternatives} = reservedTerms;
+                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryStartDate, queryEndDate, queryAlternatives} = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
-                    const objectDescription = `${queryPatternID} - ${queryContext} - updated ${queryUpdated} by ${queryUpdatedBy}`;
+                    let objectDescription = `${queryPatternID}`;
+                    if(queryContext){
+                        objectDescription += ` - ${queryContext}`;
+                    }
+                    if(queryUpdated || queryUpdatedBy){
+                        objectDescription += " - updated";
+                        if(queryUpdated){
+                            objectDescription += ` ${queryUpdated}`;
+                        }
+                        if(queryUpdatedBy){
+                            objectDescription += ` by ${queryUpdatedBy}`;
+                        }
+                    }
 
                     rule.objectID = objectID;
                     rule.description = objectDescription;
@@ -150,6 +195,13 @@ const maxPromotions = 300;
                     };
                     if(queryContext){
                         rule.condition.context = queryContext;
+                    }
+
+                    if(queryStartDate && queryEndDate && queryStartDate < queryEndDate){
+                        rule.validity = [{
+                            from: queryStartDate,
+                            until: queryEndDate
+                        }];
                     }
 
                     let consequence = {
@@ -182,14 +234,19 @@ const maxPromotions = 300;
                         return array.some((element) => value.startsWith(element));
                     };
                     for(let key in row){
-                        if(row.hasOwnProperty(key) && !arrayContains(keyExclusions, key) && typeof row[key] === 'string'){
+                        if(row.hasOwnProperty(key) && !arrayContains(keyExclusions, key) && typeof row[key] === 'string' && row[key]){
                             userData[key] = row[key].trim();
                         }
                     }
-                    consequence.userData = userData;
-                    
+                    if(Object.keys(userData).length > 0){
+                        consequence.userData = userData;
+                    }
+
                     if(Array.isArray(queryPromotions) && queryPromotions.length > 0){
                         consequence.promote = queryPromotions;
+                    }
+                    else if(Array.isArray(queryPromotionsList) && queryPromotionsList.length > 0){
+                        consequence.promote = queryPromotionsList;
                     }
 
                     rule.consequence = consequence;
@@ -217,7 +274,7 @@ const maxPromotions = 300;
                         else {
                             let successMessage = document.createElement('span');
                             successMessage.className = 'success';
-                            successMessage.innerText = `Successfully updated ${rules.length} query ${rules.length === 1? 'rule': 'rules'}.`;
+                            successMessage.innerText = `Successfully updated ${rules.length} query ${rules.length === 1 ? 'rule' : 'rules'}.`;
                             errorContainer.innerHTML = successMessage.outerHTML;
                         }
                     });

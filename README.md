@@ -19,6 +19,8 @@ To build:
   * For example, to build for Mac, you would run `electron-builder -m`
   * Multiple environments can be built in parallel
   
+A copy of the application built for [Mac](dist/Query%20Rule%20Upload-mac.dmg) is located in the [dist](dist) folder. 
+  
 ## Usage
 To use the tool, 4 pieces of information are required:
 1. A CSV file describing the query rules - a [template](spreadsheet-template.csv) is included in this repository
@@ -39,7 +41,10 @@ The spreadsheet contains the following columns:
 * [Remove Words](https://www.algolia.com/doc/api-reference/api-methods/save-rule/#method-param-delete) - this is used to remove specific words from the query. Note: this will not have any effect if "Replace Query" is set.
 * [Filters](https://www.algolia.com/doc/api-reference/api-parameters/filters/) - if you want to add filters as a query parameter, you can do so here.
 * [Optional Filters](https://www.algolia.com/doc/api-reference/api-parameters/optionalFilters/) - if you want to add optional filters as a query parameter, you can do so here. This should be formatted as a comma-separated list of filters.
-* [Promoted Item](https://www.algolia.com/doc/guides/managing-results/refine-results/merchandising-and-promoting/how-to/promote-hits/#promoting-a-single-item) - if you want to promote a specific item, you can create a column specifying where you want to promote it. For example, to promote an item to the 3rd position, you can add a column named `Promoted Item 3`.
+* [Promoted Items](https://www.algolia.com/doc/guides/managing-results/refine-results/merchandising-and-promoting/how-to/promote-hits/#promoting-a-single-item) - a comma-separated list of the objectIDs you want to promote to the beginning of the result set. **Note: if you use the more granular method of promoting items mentioned below, this parameter is ignored.** 
+* [Promoted Item](https://www.algolia.com/doc/guides/managing-results/refine-results/merchandising-and-promoting/how-to/promote-hits/#promoting-a-single-item) - if you want to promote a specific objectID, you can create a column specifying where you want to promote it. For example, to promote an item to the 3rd position, you can add a column named `Promoted Item 3`. **Note: This parameter overrides the "Promoted Items" parameter mentioned previously.**
+* [Start Date](https://www.algolia.com/doc/api-reference/api-methods/save-rule/#method-param-timerange) - the start date of the query rule, in MM/DD/YYYY format. **Note: This value will be ignored if no end date is entered, or if the start date is after the end date.**
+* [End Date](https://www.algolia.com/doc/api-reference/api-methods/save-rule/#method-param-timerange) - the end date of the query rule, in MM/DD/YYYY format. **Note: This value will be ignored if no start date is entered, or if the end date is before the start date.**
 * Alternatives - this can be set to `true` to enable alternatives to be considered for this rule. **Note: this feature is in beta and only available for certain Enterprise customers.**  
 * All other fields will be added as custom data. For example, the template has columns named `CustomDataField1` and `CustomDataField2`, which will add custom data in the following format: 
     ```  
