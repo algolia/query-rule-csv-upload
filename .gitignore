@@ -5,3 +5,4 @@ temp/
 dist/**
 .DS_Store
 !dist/*.dmg
+!dist/*.exe
