@@ -122,7 +122,7 @@ const maxPromotions = 300;
                                     if(Array.isArray(objectIds) && Array.isArray(objectIds[0])){
                                         return objectIds[0].map((value, index) => {
                                             return {
-                                                "objectID": value,
+                                                "objectID": value.trim(),
                                                 "position": index
                                             };
                                         });
