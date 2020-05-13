@@ -61,6 +61,7 @@ const maxPromotions = 300;
                     let rule = {};
 
                     const defaultExtractor = (row, key) => row[key] && row[key].trim();
+                    const lowerCaseExtractor = (row, key) => row[key] && row[key].trim().toLowerCase();
                     const dateExtractor = (row, key) => {
                         if(row[key]){
                             const m = moment(row[key], 'MM/DD/YYYY');
@@ -147,6 +148,10 @@ const maxPromotions = 300;
                                 return promotedItems;
                             }
                         },
+                        'Promoted Items Follow Filters': {
+                            name: 'queryFollowsFilters',
+                            extractor: lowerCaseExtractor
+                        },
                         "Start Date": {
                             name: 'queryStartDate',
                             extractor: dateExtractor
@@ -157,7 +162,11 @@ const maxPromotions = 300;
                         },
                         'Alternatives': {
                             name: 'queryAlternatives',
-                            extractor: (row, key) => row[key] && row[key].trim().toLowerCase()
+                            extractor: lowerCaseExtractor
+                        },
+                        'Analytics': {
+                            name: 'queryAnalytics',
+                            extractor: lowerCaseExtractor
                         }
                     };
 
@@ -167,7 +176,7 @@ const maxPromotions = 300;
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const {queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryStartDate, queryEndDate, queryAlternatives} = reservedTerms;
+                    const { queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryStartDate, queryEndDate, queryAlternatives, queryAnalytics, queryFollowsFilters } = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
@@ -228,6 +237,10 @@ const maxPromotions = 300;
                     if(queryOptionalFilters){
                         consequence.params.optionalFilters = queryOptionalFilters;
                     }
+                    if(queryAnalytics === 'false'){
+                        consequence.params.analytics = false;
+                    }
+
                     let userData = {};
                     const keyExclusions = Object.keys(reservedTermDefinitions);
                     const arrayContains = (array, value) => {
@@ -247,6 +260,9 @@ const maxPromotions = 300;
                     }
                     else if(Array.isArray(queryPromotionsList) && queryPromotionsList.length > 0){
                         consequence.promote = queryPromotionsList;
+                    }
+                    if(consequence.promote && queryFollowsFilters === 'true'){
+                        consequence.filterPromotes = true;
                     }
 
                     rule.consequence = consequence;

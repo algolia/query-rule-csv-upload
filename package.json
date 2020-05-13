@@ -6,17 +6,17 @@
   "scripts": {
     "start": "electron .",
     "pack": "electron-builder --dir",
-    "dist": "electron-builder"
+    "dist": "electron-builder -mw"
   },
   "dependencies": {
-    "algoliasearch": "^3.33.0",
-    "csv-parser": "^2.3.0",
-    "csv-string": "^3.1.6",
-    "moment": "^2.24.0"
+    "algoliasearch": "^3.35.1",
+    "csv-parser": "^2.3.2",
+    "csv-string": "^3.2.0",
+    "moment": "^2.25.3"
   },
   "devDependencies": {
-    "electron": "^5.0.5",
-    "electron-builder": "^20.44.4"
+    "electron": "^5.0.13",
+    "electron-builder": "^22.6.0"
   },
   "build": {
     "appId": "com.algolia.queryruleupload",
