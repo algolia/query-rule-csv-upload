@@ -48,6 +48,7 @@ The spreadsheet contains the following columns:
 * [End Date](https://www.algolia.com/doc/api-reference/api-methods/save-rule/#method-param-timerange) - the end date of the query rule, in MM/DD/YYYY format. **Note: This value will be ignored if no start date is entered, or if the end date is before the start date.**
 * Alternatives - this can be set to `true` to enable alternatives to be considered for this rule. **Note: this feature is in beta and only available for certain Enterprise customers.**
 * Analytics - setting this to `false` will add a custom query parameter consequence setting the [analytics query parameter](https://www.algolia.com/doc/api-reference/api-parameters/analytics/) to false.
+* [Facet Position](https://www.algolia.com/doc/guides/solutions/gallery/dynamic-facet-positioning/) - if you want to set a facet to a specific position, you can create a column specifying where you want to position it. For example, to set a facet in the 3rd position, you can add a column named `Facet Position 3`. **Note: In order for the facet positions to take effect, there is custom frontend development required - see [this guide](https://www.algolia.com/doc/guides/solutions/gallery/dynamic-facet-positioning/#create-a-dynamic-facet-positioning-rendering-widget) for more information.**
 * All other fields will be added as custom data. For example, the template has columns named `CustomDataField1` and `CustomDataField2`, which will add custom data in the following format: 
     ```  
     {
