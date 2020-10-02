@@ -167,6 +167,23 @@ const maxPromotions = 300;
                         'Analytics': {
                             name: 'queryAnalytics',
                             extractor: lowerCaseExtractor
+                        },
+                        "Facet Position": {
+                            name: 'queryFacetPositions',
+                            extractor: (row, key) => {
+                                let facetPositions = Object.keys(row)
+                                .filter(k => k.startsWith(key))
+                                .filter(k => parseInt(k.slice(key.length).trim()) !== NaN)
+                                .filter(k => row[k])
+                                .map(k => {
+                                    const position = parseInt(k.slice(key.length).trim());      
+                                    return {
+                                        name: row[k],
+                                        position: position
+                                    };
+                                });
+                                return facetPositions;
+                            }
                         }
                     };
 
@@ -176,7 +193,7 @@ const maxPromotions = 300;
                         reservedTerms[definition.name] = definition.extractor(row, key);
                     }
 
-                    const { queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryStartDate, queryEndDate, queryAlternatives, queryAnalytics, queryFollowsFilters } = reservedTerms;
+                    const { queryUpdated, queryUpdatedBy, queryPatternID, queryEnabled, queryContext, queryAnchoring, queryPattern, queryReplacement, queryRemoveWords, queryFilters, queryOptionalFilters, queryPromotionsList, queryPromotions, queryStartDate, queryEndDate, queryAlternatives, queryAnalytics, queryFollowsFilters, queryFacetPositions } = reservedTerms;
 
                     const formattedQueryPattern = queryPatternID.replace(/[^\w]/gi, '');
                     const objectID = `${queryContext}--${formattedQueryPattern}`;
@@ -250,6 +267,9 @@ const maxPromotions = 300;
                         if(row.hasOwnProperty(key) && !arrayContains(keyExclusions, key) && typeof row[key] === 'string' && row[key]){
                             userData[key] = row[key].trim();
                         }
+                    }
+                    if(Array.isArray(queryFacetPositions) && queryFacetPositions.length > 0){
+                        userData.facetPositions = queryFacetPositions;
                     }
                     if(Object.keys(userData).length > 0){
                         consequence.userData = userData;
