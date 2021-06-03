@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "electron": "^10.1.3",
-    "electron-builder": "^22.6.0"
+    "electron-builder": "22.11.4"
   },
   "build": {
     "appId": "com.algolia.queryruleupload",
