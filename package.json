@@ -12,7 +12,7 @@
     "algoliasearch": "^3.35.1",
     "csv-parser": "^2.3.2",
     "csv-string": "^3.2.0",
-    "moment": "^2.25.3"
+    "moment": "^2.29.4"
   },
   "devDependencies": {
     "electron": "^10.1.3",
